@@ -1,3 +1,4 @@
+from datetime import datetime
 from numpy import loadtxt
 
 import keras
@@ -7,6 +8,10 @@ from keras.datasets import mnist
 
 from .classes.dropout import DynamicDropout
 from .classes.l1l2 import DynamicL1L2
+
+
+def prettify_datetime(time: datetime) -> str:
+    return time.strftime('%m.%d.%Y_%H:%M:%S')
 
 
 def set_model_l1_l2(model, l1=0, l2=0.01):
