@@ -96,4 +96,4 @@ def load_tf_dataset(tf_dataset_name: str, img_size: list = None):
             num_parallel_calls=tf.data.experimental.AUTOTUNE,
         )
 
-    return (ds_train, ds_test), ds_info, img_size
+    return (ds_train, ds_test), ds_info

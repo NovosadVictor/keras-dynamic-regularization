@@ -10,7 +10,8 @@ from constants.classes.model import CNNModel
 # device_name = tf.test.gpu_device_name()
 # print(device_name)
 
-(ds_train, ds_test), ds_info, input_shape = load_tf_dataset('cifar10')
+input_shape = [32, 32, 3]
+(ds_train, ds_test), ds_info = load_tf_dataset('cifar10')
 n_classes = ds_info.features['label'].num_classes
 print(n_classes)
 
