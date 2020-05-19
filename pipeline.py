@@ -7,8 +7,8 @@ import tensorflow as tf
 from constants.utils import load_tf_dataset, prettify_datetime
 from constants.classes.model import CNNModel
 
-# device_name = tf.test.gpu_device_name()
-# print(device_name)
+device_name = tf.test.gpu_device_name()
+print('\n\n', device_name, '\n\n')
 
 input_shape = [32, 32, 3]
 (ds_train, ds_test), ds_info = load_tf_dataset('cifar10')
@@ -16,27 +16,27 @@ n_classes = ds_info.features['label'].num_classes
 print(n_classes)
 
 histories = []
-# with tf.device(device_name):
-dropout_parameters = []
-for is_dynamic_dropout in [False, True]:
-    model = CNNModel(
-        input_shape=input_shape,
-        n_classes=n_classes,
-        is_dynamic_dropout=is_dynamic_dropout,
-    )
-    model.fit(
-        ds_train,
-        n_epochs=5,
-        validation_data=ds_test,
-        is_show=False,
-    )
+with tf.device(device_name):
+    dropout_parameters = []
+    for is_dynamic_dropout in [False, True]:
+        model = CNNModel(
+            input_shape=input_shape,
+            n_classes=n_classes,
+            is_dynamic_dropout=is_dynamic_dropout,
+        )
+        model.fit(
+            ds_train,
+            n_epochs=5,
+            validation_data=ds_test,
+            is_show=False,
+        )
 
-    score = model.model.evaluate(ds_test, verbose=0)
-    print('Test loss:', score[0])
-    print('Test accuracy:', score[1])
+        score = model.model.evaluate(ds_test, verbose=0)
+        print('Test loss:', score[0])
+        print('Test accuracy:', score[1])
 
-    histories.append(model.history)
-    dropout_parameters.append(model.parameters)
+        histories.append(model.history)
+        dropout_parameters.append(model.parameters)
 
 
 with open('histories/histories_{}.json'.format(prettify_datetime(datetime.now())), 'w') as histories_file:
