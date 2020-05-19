@@ -1,5 +1,5 @@
-from keras.regularizers import Regularizer
-from keras import backend as K
+from tensorflow.keras.regularizers import Regularizer
+from tensorflow.keras import backend as K
 
 
 class DynamicL1L2(Regularizer):

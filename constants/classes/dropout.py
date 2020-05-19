@@ -1,5 +1,5 @@
-from keras.layers import Dropout
-from keras import backend as K
+from tensorflow.keras.layers import Dropout
+from tensorflow.keras import backend as K
 
 
 class DynamicDropout(Dropout):
