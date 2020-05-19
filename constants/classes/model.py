@@ -22,7 +22,7 @@ class CNNModel:
         self.model = None
         self.parameters = []
         self.history = None
-        self.save_dir = f'{kwargs.get("is_dynamic_dropout", False)}'
+        self.save_dir = '{}'.format(kwargs.get("is_dynamic_dropout", False))
 
         self.callbacks = [
             keras.callbacks.ModelCheckpoint(

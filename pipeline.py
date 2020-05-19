@@ -38,15 +38,15 @@ for is_dynamic_dropout in [False, True]:
     dropout_parameters.append(model.parameters)
 
 
-with open(f"histories/histories_{prettify_datetime(datetime.now())}.json", 'w') as histories_file:
+with open('histories/histories_{}.json'.format(prettify_datetime(datetime.now())), 'w') as histories_file:
     json.dump(histories, histories_file, indent=4)
-with open(f"histories/parameters_{prettify_datetime(datetime.now())}.json", 'w') as parameters_file:
+with open('histories/parameters_{}.json'.format(prettify_datetime(datetime.now())), 'w') as parameters_file:
     json.dump(dropout_parameters, parameters_file, indent=4)
 
 plt.figure(figsize=(12, 10))
 legends_acc = sum(
     [
-        [f'{index}_train acc', f'{index}_test acc']
+        ['{}_train acc'.format(index), '{}_test acc'.format(index)]
         for index in range(len(histories))
     ],
     [],
@@ -68,7 +68,7 @@ plt.show()
 plt.figure(figsize=(12, 10))
 legends_loss = sum(
     [
-        [f'{index}_train loss', f'{index}_test loss']
+        ['{}_train loss'.format(index), '{}_test loss'.format(index)]
         for index in range(len(histories))
     ],
     [],
