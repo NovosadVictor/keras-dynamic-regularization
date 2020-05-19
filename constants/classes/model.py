@@ -96,7 +96,7 @@ class CNNModel:
                 epochs=n_epochs,
                 validation_data=validation_data,
                 callbacks=self.callbacks + [dropout_callback],
-                verbose=0,
+                verbose=1,
             ).history
             self.parameters = dropout_callback.parameters[:]
 
