@@ -100,6 +100,7 @@ class CNNModel:
             ).history
             self.parameters = dropout_callback.parameters[:]
 
+            self.model.save('save.h5df')
             if is_show:
               self.display()
 
