@@ -3,4 +3,5 @@
 **.pyc**
 **pycache**
 **.csv**
-
+**.hdf5**
+**venv**

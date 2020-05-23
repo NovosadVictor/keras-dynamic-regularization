@@ -1,9 +1,9 @@
-from keras.layers import Dropout
-from keras import backend as K
+from tensorflow.keras.layers import Dropout
+from tensorflow.keras import backend as K
 
 
 class DynamicDropout(Dropout):
-    def __init__(self, rate, *args, is_dynamic=True, **kwargs):
+    def __init__(self, rate=0.5, *args, is_dynamic=True, **kwargs):
         super(DynamicDropout, self).__init__(rate, *args, **kwargs)
 
         self.is_dynamic = is_dynamic
