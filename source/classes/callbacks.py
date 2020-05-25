@@ -5,10 +5,10 @@ from .dropout import DynamicDropout
 
 
 class DropoutParameterCallback(keras.callbacks.Callback):
-    def __init__(self, model, *args, **kwargs):
+    def __init__(self, model):
         self.model = model
         self.parameters = []
-        super(DropoutParameterCallback, self).__init__(*args, **kwargs)
+        super(DropoutParameterCallback, self).__init__()
 
     def on_epoch_end(self, epoch, logs=None):
         if epoch % 5 == 0:
@@ -21,6 +21,6 @@ class DropoutParameterCallback(keras.callbacks.Callback):
             for index, layer in enumerate(self.model.layers):
                 if isinstance(layer, DynamicDropout):
                     rate = layer.rate
-                    rate = K.get_value(rate)
+                    rate = float(K.get_value(rate))
                     self.parameters.append(rate)
                     break

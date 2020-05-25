@@ -2,59 +2,42 @@ import os
 from matplotlib import pyplot as plt
 import json
 
+histories_dir = 'histories'
+
+history_files = [name for name in os.listdir(histories_dir) if 'history' in name]
+parameter_files = [name for name in os.listdir(histories_dir) if 'parameters' in name]
 
 histories = []
-with open('histories/histories_05.21.2020_18_58_04.json', 'r') as f:
-    histories.append(json.load(f))
+for name in history_files:
+    with open(os.path.join(histories_dir, name), 'r') as f:
+        histories.append(json.load(f))
 
-dropout_parameters = []
-with open('histories/parameters_05.21.2020_18_58_04.json', 'r') as f:
-    dropout_parameters.append(json.load(f))
+parameters = []
+for name in parameter_files:
+    with open(os.path.join(histories_dir, name), 'r') as f:
+        parameters.append([float(name.split('_')[4])] + json.load(f))
 
 
+plt.figure(figsize=(14, 10))
+legends_acc = sum(
+    [
+        ['{}_test acc'.format(history_files[i])]
+        for i in range(len(histories))
+    ],
+    [],
+)
+plt.title('model accuracy')
+plt.ylabel('accuracy')
+plt.xlabel('epoch')
 for i in range(len(histories)):
-    plt.figure(figsize=(12, 10))
-    legends_acc = sum(
-        [
-            ['{}_train acc'.format(index), '{}_test acc'.format(index)]
-            for index in range(len(histories[i]))
-        ],
-        [],
-    )
-    plt.title('model accuracy')
-    plt.ylabel('accuracy')
-    plt.xlabel('epoch')
+    # summarize history for accuracy
+    color = 'red'
+    if 'True' in history_files[i]:
+        color = 'blue'
+    plt.plot(histories[i]['val_accuracy'])
 
-    for history in histories[i]:
-        # summarize history for accuracy
-        plt.plot(history['accuracy'])
-        plt.plot(history['val_accuracy'])
+    # plt.plot([j * 5 for j in range(len(parameters[i]))], parameters[i])
 
-    for parameters in dropout_parameters[i]:
-        plt.plot(parameters)
-
-    plt.legend(legends_acc, loc='upper right')
-    plt.show()
-
-    plt.figure(figsize=(12, 10))
-    legends_loss = sum(
-        [
-            ['{}_train loss'.format(index), '{}_test loss'.format(index)]
-            for index in range(len(histories[i]))
-        ],
-        [],
-    )
-    plt.title('model loss')
-    plt.ylabel('loss')
-    plt.xlabel('epoch')
-
-    for history in histories[i]:
-        # summarize history for loss
-        plt.plot(history['loss'])
-        plt.plot(history['val_loss'])
-
-    for parameters in dropout_parameters[i]:
-        plt.plot(parameters)
-
-    plt.legend(legends_loss, loc='upper right')
-    plt.show()
+plt.ylim([0.75, 0.9])
+plt.legend(legends_acc, loc='lower right')
+plt.show()

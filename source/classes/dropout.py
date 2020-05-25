@@ -6,17 +6,20 @@ class DynamicDropout(Dropout):
     def __init__(self, rate=0.5, *args, is_dynamic=True, **kwargs):
         super(DynamicDropout, self).__init__(rate, *args, **kwargs)
 
-        self.is_dynamic = is_dynamic
-        if self.is_dynamic:
+        if is_dynamic:
             self.rate = K.variable(self.rate, name='rate')
+            self.rate_value = rate
 
-        self.rate_value = rate
+        self.is_dynamic = is_dynamic
 
     def set_dropout(self, rate):
         K.set_value(self.rate, rate)
         self.rate_value = rate
 
     def call(self, inputs, training=None):
+        if not self.is_dynamic:
+            return super(DynamicDropout, self).call(inputs, training)
+
         if 0. < self.rate_value < 1.:
             noise_shape = self._get_noise_shape(inputs)
 
@@ -36,13 +39,8 @@ class DynamicDropout(Dropout):
         return inputs
 
     def get_config(self):
-        config = {}
+        config = super(DynamicDropout, self).get_config()
         if self.is_dynamic:
             config['rate'] = K.get_value(self.rate)
 
-        base_config = super(DynamicDropout, self).get_config()
-        print(base_config)
-        return {
-            **base_config,
-            **config,
-        }
+        return config
