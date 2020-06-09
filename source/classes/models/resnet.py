@@ -8,6 +8,7 @@ from tensorflow.keras.layers import \
     BatchNormalization, \
     Add
 from tensorflow.keras.models import Model
+from tensorflow import GradientTape
 from tensorflow import Tensor
 
 
@@ -48,7 +49,7 @@ class ResNet:
         return bn
 
     @staticmethod
-    def __residual_block(x: Tensor, down_sample: bool, filters: int, kernel_size: int = 3) -> Tensor:
+    def __residual_block(x: Tensor5, down_sample: bool, filters: int, kernel_size: int = 3) -> Tensor:
         y = Conv2D(
             kernel_size=kernel_size,
             strides=(1 if not down_sample else 2),
