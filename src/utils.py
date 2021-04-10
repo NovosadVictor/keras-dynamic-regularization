@@ -1,35 +1,17 @@
+from math import exp
 from datetime import datetime
 from functools import partial
 
 import tensorflow as tf
 import tensorflow_datasets as tfds
-from tensorflow.keras.losses import binary_crossentropy
 
-from .classes.dropout import DynamicDropout
-from .classes.l1l2 import DynamicL1L2
+
+def make_save_prefix_name(kwargs: dict) -> str:
+    return '_'.join([f'{key}={str(value)}' for key, value in kwargs.items()])
 
 
 def prettify_datetime(time: datetime) -> str:
     return time.strftime('%m.%d.%Y_%H:%M:%S')
-
-
-def set_model_l1_l2(model, l1=0, l2=0.01):
-    for layer in model.layers:
-        if 'kernel_regularizer' in dir(layer) and isinstance(layer.kernel_regularizer, DynamicL1L2):
-            layer.kernel_regularizer.set_l1_l2(l1, l2)
-
-
-def set_model_dropout(model, dropout=0.5):
-    for layer in model.layers:
-        if isinstance(layer, DynamicDropout):
-            layer.set_dropout(dropout)
-
-
-def loss_wrapper(dropout_layer):
-    def loss(y_true, y_pred):
-        return binary_crossentropy(y_true, y_pred)
-
-    return loss
 
 
 def resize_img(image, label, size):
@@ -46,13 +28,21 @@ def categorize_label(image, label, n_classes):
     return image, label
 
 
-def load_tf_dataset(tf_dataset_name: str, img_size: list = None):
+def load_tf_dataset(
+    tf_dataset_name: str,
+    img_size: list = None,
+    batch_size: int = 128,
+    data_dir: str = None,
+    download_and_prepare_kwargs: dict = None,
+):
     (ds_train, ds_test), ds_info = tfds.load(
         tf_dataset_name,
+        data_dir=data_dir,
         split=['train', 'test'],
         with_info=True,
         shuffle_files=True,
         as_supervised=True,
+        download_and_prepare_kwargs=download_and_prepare_kwargs,
     )
     n_classes = ds_info.features['label'].num_classes
     categorize = partial(categorize_label, n_classes=n_classes)
@@ -69,7 +59,7 @@ def load_tf_dataset(tf_dataset_name: str, img_size: list = None):
     )
     ds_train = ds_train.cache()
     ds_train = ds_train.shuffle(ds_info.splits['train'].num_examples)
-    ds_train = ds_train.batch(128)
+    ds_train = ds_train.batch(batch_size)
     ds_train = ds_train.prefetch(tf.data.experimental.AUTOTUNE)
 
     # test
@@ -81,7 +71,7 @@ def load_tf_dataset(tf_dataset_name: str, img_size: list = None):
         categorize,
         num_parallel_calls=tf.data.experimental.AUTOTUNE,
     )
-    ds_test = ds_test.batch(128)
+    ds_test = ds_test.batch(batch_size)
     ds_test = ds_test.cache()
     ds_test = ds_test.prefetch(tf.data.experimental.AUTOTUNE)
 
@@ -97,3 +87,10 @@ def load_tf_dataset(tf_dataset_name: str, img_size: list = None):
         )
 
     return (ds_train, ds_test), ds_info
+
+
+def learning_rate_scheduler(init_rate=0.001, k=0.01):
+    def learning_rate_schedule(epoch, lr):
+        return init_rate * exp(-k * epoch)
+
+    return learning_rate_schedule

@@ -31,7 +31,9 @@ class ResNet:
             num_blocks = num_blocks_list[i]
             for j in range(num_blocks):
                 t = ResNet.__residual_block(t, down_sample=(j == 0 and i != 0), filters=num_filters)
-                t = dropout(t)
+
+            t = dropout['class'](**dropout['kwargs'])(t)
+
             num_filters *= 2
 
         t = AveragePooling2D(4)(t)
