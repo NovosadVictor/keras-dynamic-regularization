@@ -1,0 +1,24 @@
+{
+  "model": {
+    "name": "resnet",
+    "restore": false,
+    "loss": "categorical_crossentropy",
+    "optimizer": "adam",
+    "n_epochs": 200
+  },
+  "database": {
+    "name": "cifar10",
+    "kwargs": {},
+    "input_shape": [32, 32, 3]
+  },
+  "dropout": {
+    "is_dynamic": true,
+    "class": "crossmap_drop_block",
+    "block_size": 3,
+    "rate": 0.2
+  },
+  "learning_rate": {
+    "init": 0.001,
+    "change_rate": 0.01
+  }
+}

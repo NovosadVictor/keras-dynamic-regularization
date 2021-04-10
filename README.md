@@ -1,13 +1,8 @@
-# Keras with dynamic regularization parameters
+# DynamicCrossmapDropBlock
 
-## Build model
+## 1) Setup config.json
 
-```
-constantants/classes/model.py
-```
-
-## Write pipeline
-
-```
-pipeline.py
+## 2) Run code
+```shell
+python3 -m main
 ```
