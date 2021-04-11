@@ -6,10 +6,6 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 
 
-def make_save_prefix_name(kwargs: dict) -> str:
-    return '_'.join([f'{key}={str(value)}' for key, value in kwargs.items()])
-
-
 def prettify_datetime(time: datetime) -> str:
     return time.strftime('%m.%d.%Y_%H:%M:%S')
 

@@ -8,11 +8,11 @@ from tensorflow.keras import backend as K
 
 
 class DynamicDropout(Dropout):
-    def __init__(self, rate=0.5, is_dynamic=True):
+    def __init__(self, rate=0.5, is_dynamic=True, **kwargs):
         super(DynamicDropout, self).__init__(rate)
 
         if is_dynamic:
-            self.rate = K.variable(self.rate, name='rate')
+            self.rate = K.variable(self.rate, name='rate_' + str(uuid4()))
             self.rate_value = rate
 
         self.is_dynamic = is_dynamic
@@ -52,9 +52,10 @@ class DynamicDropout(Dropout):
 
 
 class CrossmapDropBlock(Layer):
-    def __init__(self, rate, block_size, *args, scale=True, **kwargs):
-        super(CrossmapDropBlock, self).__init__(*args, **kwargs)
+    def __init__(self, rate, block_size, scale=True):
+        super(CrossmapDropBlock, self).__init__()
         self.rate = rate
+
         self.block_size = int(block_size)
         self.scale = scale
 
@@ -123,8 +124,8 @@ class CrossmapDropBlock(Layer):
 
 
 class DynamicCrossmapDropBlock(CrossmapDropBlock):
-    def __init__(self, rate=0.5, *args, is_dynamic=True, **kwargs):
-        super(CrossmapDropBlock, self).__init__(rate, *args, **kwargs)
+    def __init__(self, rate, block_size, is_dynamic=True, **kwargs):
+        super(DynamicCrossmapDropBlock, self).__init__(rate, block_size)
 
         self.rate_value = self.rate
         if is_dynamic:

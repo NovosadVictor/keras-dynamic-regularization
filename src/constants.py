@@ -5,8 +5,11 @@ from .classes.dynamic_dropouts import DynamicDropout, DynamicCrossmapDropBlock
 from .helpers import make_sure_dir_exists
 
 
-MODEL_SAVE_DIR = make_sure_dir_exists('./models/')
-HISTORY_SAVE_DIR = make_sure_dir_exists('./histories/')
+BASE_DIR = '.'
+
+DATABASES_DIR = make_sure_dir_exists(f'{BASE_DIR}/databases/')
+MODEL_SAVE_DIR = make_sure_dir_exists(f'{BASE_DIR}/models/')
+HISTORY_SAVE_DIR = make_sure_dir_exists(f'{BASE_DIR}/histories/')
 
 
 MODELS = {

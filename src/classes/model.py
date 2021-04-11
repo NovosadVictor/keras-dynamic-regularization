@@ -22,7 +22,7 @@ class CNNModel:
             optimizer: str or object,
             save_prefix: str,
             save_dir: str,
-
+            initial_epoch: int = 0,
     ):
         self.model = None
         self.parameters = []
@@ -40,8 +40,10 @@ class CNNModel:
 
         self.save_prefix = save_prefix
         self.is_restore = model['is_restore']
+        self.restore_dir = model['restore_dir']
         self.save_dir = save_dir
 
+        self.initial_epoch = initial_epoch
 
         self.callbacks = [
             keras.callbacks.LearningRateScheduler(
@@ -49,7 +51,7 @@ class CNNModel:
                 verbose=1,
             ),
             keras.callbacks.ModelCheckpoint(
-                filepath=self.save_dir + self.save_prefix + '_{epoch:04d}-{val_loss:.2f}.hdf5',
+                filepath=self.save_dir + self.save_prefix + '/{epoch:04d}-{val_loss:.2f}.hdf5',
                 period=50,
             ),
         ]
@@ -61,9 +63,9 @@ class CNNModel:
     def build_or_restore_model(self):
         if self.is_restore:
             checkpoints = [
-                os.path.join(self.save_dir, name)
-                for name in os.listdir(self.save_dir)
-                if self.save_prefix in name
+                os.path.join(self.save_dir, self.restore_dir, name)
+                for name in os.listdir(os.path.join(self.save_dir, self.restore_dir))
+                if 'hdf5' in name
             ]
 
             if checkpoints:
@@ -77,12 +79,16 @@ class CNNModel:
                         DynamicDropout.__name__: DynamicDropout,
                     },
                 )
-        else:
-            logging.info('Building a new model')
-            self.build_model()
+
+                self.initial_epoch = int(latest_checkpoint.split('/')[-1].split('-')[0]) + 1
+
+                return
+
+        logging.info('Building a new model')
+        self.build_model()
 
     def build_model(self):
-        if self.model_name == 'resnet':
+        if self.model_name == 'res_net':
             self.model = ResNet.build(self.dropout, self.input_shape, self.n_classes)
 
         optimizer = self.optimizer if isinstance(self.optimizer, str) else self.optimizer(self.learning_rate['init'])
@@ -97,20 +103,19 @@ class CNNModel:
             ds_train,
             n_epochs,
             validation_data=None,
-            initial_epoch=0,
             verbose=1,
             save=True,
     ):
         if self.model:
             dropout_callback = DropoutParameterCallback(self.model, self.save_prefix)
-            filename = HISTORY_SAVE_DIR + '{}_history.csv'.format(self.save_prefix)
+            filename = HISTORY_SAVE_DIR + '{}/history.csv'.format(self.save_prefix)
             history_logger = tf.keras.callbacks.CSVLogger(filename, separator=',', append=True)
 
             self.history = self.model.fit(
                 ds_train,
                 epochs=n_epochs,
                 validation_data=validation_data,
-                initial_epoch=initial_epoch,
+                initial_epoch=self.initial_epoch,
                 callbacks=self.callbacks + [dropout_callback, history_logger],
                 verbose=verbose,
             ).history

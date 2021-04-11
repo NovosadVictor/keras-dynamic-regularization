@@ -2,23 +2,27 @@
   "model": {
     "name": "resnet",
     "restore": false,
+    "restore_dir": "",
     "loss": "categorical_crossentropy",
     "optimizer": "adam",
-    "n_epochs": 200
+    "n_epochs": 250
   },
   "database": {
     "name": "cifar10",
-    "kwargs": {},
+    "kwargs": {
+      "data_dir": "./datasets-2/imagenet/"
+    },
     "input_shape": [32, 32, 3]
   },
   "dropout": {
     "is_dynamic": true,
-    "class": "crossmap_drop_block",
+    "class": "standard",
     "block_size": 3,
-    "rate": 0.2
+    "rate": 0.4
   },
   "learning_rate": {
     "init": 0.001,
     "change_rate": 0.01
-  }
+  },
+  "multiple_gpu": false
 }

@@ -10,10 +10,11 @@ from .dynamic_dropouts import DynamicDropout, DynamicCrossmapDropBlock
 
 
 class DropoutParameterCallback(keras.callbacks.Callback):
-    def __init__(self, model, save_prefix, freq: int = 1, linear_scheduling: dict = None):
+    def __init__(self, model, save_prefix, freq: int = 1, save_freq: int = 25, linear_scheduling: dict = None):
         self.model = model
         self.save_prefix = save_prefix
         self.freq = freq
+        self.save_freq = save_freq
         self.linear_scheduling = linear_scheduling
         self.parameters = []
         super(DropoutParameterCallback, self).__init__()
@@ -44,10 +45,10 @@ class DropoutParameterCallback(keras.callbacks.Callback):
 
             logging.info('rates: %s', rates)
             self.parameters.append({'epoch': int(epoch), 'rates': rates})
-        if epoch > 0 and epoch % 25 == 0:
+        if epoch > 0 and epoch % self.save_freq == 0:
             now = prettify_datetime(datetime.now())
             with open(
-                HISTORY_SAVE_DIR + '{}-{}-{}_parameters.json'.format(self.save_prefix, epoch, now),
+                HISTORY_SAVE_DIR + '{}/{}-{}_parameters.json'.format(self.save_prefix, epoch, now),
                 'w',
             ) as parameters_file:
                 json.dump(self.parameters, parameters_file, indent=4)
